@@ -17,6 +17,8 @@ class Layer_Dense:
 
     def forward(self, inputs):
         self.output = np.dot(inputs, self.weights) + self.biases
+        self.activation.forward(self.output)
+        print (self.activation.output)
     
     def setWeights(self, weights, biases):
         self.weights = weights
@@ -60,63 +62,43 @@ class NeuralNet:
     def __init__(self, num_inputs, num_outputs, num_layers, nodesPerLayer):
         self.inputLayer = Layer_Dense(num_inputs, nodesPerLayer, Activation_ReLU())
         self.outputLayer = Layer_Dense(nodesPerLayer, num_outputs, Activation_Softmax())
-        self.hiddenLayers = []
+        self.Layers = []
+        self.Layers.append(self.inputLayer)
         for layer in range(num_layers-2):
-            self.hiddenLayers.append(Layer_Dense(nodesPerLayer,nodesPerLayer, Activation_ReLU()))
+            self.Layers.append(Layer_Dense(nodesPerLayer,nodesPerLayer, Activation_ReLU()))
+        self.Layers.append(self.outputLayer)
         
     def forward(self, inputs):
         self.inputLayer.forward(inputs)
-        #print(self.inputLayer.output)
-        self.inputLayer.activation.forward(self.inputLayer.output)
-        #print(self.inputLayer.activation.output)
-        for layer in range(len(self.hiddenLayers)):
-            if layer == 0:
-                self.hiddenLayers[0].forward(self.inputLayer.activation.output)
-                #print(self.hiddenLayers[0].output)
-                self.hiddenLayers[0].activation.forward(self.hiddenLayers[0].output)
-                #print (self.hiddenLayers[0].activation.output)
-            else:
-                self.hiddenLayers[layer].forward(self.hiddenLayers[layer-1].activation.output)
-                #print(self.hiddenLayers[layer-1].activation.output)
-                self.hiddenLayers[layer].activation.forward(self.hiddenLayers[layer].output)
-        self.outputLayer.forward(self.hiddenLayers[-1].activation.output)
-        #print(self.outputLayer.output)
-        self.outputLayer.activation.forward(self.outputLayer.output)
-        #print(self.output)
+        for i in range(1,len(self.Layers)):
+            print(i)
+            self.Layers[i].forward(self.Layers[i-1].activation.output)
         self.output = self.outputLayer.activation.output
         return self.output
 
     def getWeights(self):
-        inputWeights = self.inputLayer.weights
-        hiddenWeights = []
-        for layer in self.hiddenLayers:
-            hiddenWeights.append(layer.weights)
-        
-        outputWeights = self.outputLayer.weights
-        weights = [inputWeights, np.array(hiddenWeights), outputWeights]
+        weights = []
+        for layer in self.Layers:
+            weights.append(layer.weights)
         return weights
 
     def getBiases(self):
-        inputBiases = self.inputLayer.biases
-        hiddenBiases = []
-        for layer in self.hiddenLayers:
-            hiddenBiases.append(layer.biases)
-        
-        outputBiases = self.outputLayer.biases
-        biases = [inputBiases, np.array(hiddenBiases), outputBiases]
+        biases = []
+        for layer in self.Layers:
+            biases.append(layer.biases)
         return biases
 
     def setBiases(self, biases):
         self.inputLayer.biases = biases[0]
-        self.outputLayer.biases = biases[2]
-        for i in range(len(self.hiddenLayers)):
-            self.hiddenLayers[i].biases = biases[1][i]
+        self.outputLayer.biases = biases[-1]
+        for i in range(1, len(self.Layers)-1):
+            self.Layers[i].biases = biases[i]
 
     def setWeights(self, weights):
         self.inputLayer.weights = weights[0]
-        self.outputLayer.weights = weights[2]
-        for i in range(len(self.hiddenLayers)):
-            self.hiddenLayers[i].weights = weights[1][i]
+        self.outputLayer.weights = weights[-1]
+        for i in range(1, len(self.Layers)-1):
+            self.Layers[i].biases = weights[i]
 
     def setFitness(self, fitness):
         self.fitness = fitness
@@ -131,24 +113,5 @@ class NeuralNet:
             return False
 
 
-'''
-X, y = spiral_data(samples = 100, classes = 3)
-dense1 = Layer_Dense(2,3)
-activation1 = Activation_ReLU()
 
-dense2= Layer_Dense(3, 3)
-activation2 = Activation_Softmax()
-
-dense1.forward(X)
-activation1.forward(dense1.output)
-
-dense2.forward(activation1.output)
-activation2.forward(dense2.output)
-
-print(activation2.output[:5])
-
-loss_function = Loss_CategoricalCrossentropy()
-loss = loss_function.calculate(activation2.output, y)
-print(loss)
-'''
 

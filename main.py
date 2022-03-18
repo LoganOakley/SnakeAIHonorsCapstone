@@ -106,9 +106,9 @@ def Train(population, num_generations, num_survivors):
 
     
 
-population = createPop(members = 484)
+population = createPop(members = 9)
 
-Train(population, 2000, 22) 
+Train(population, 5, 3) 
 
 
  
