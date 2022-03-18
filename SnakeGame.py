@@ -15,7 +15,7 @@ green = (0, 255, 0)
 blue = (50, 153, 213)
 
 class SnakeGame():
-    def __init__(self, gameSpeed,cap_moves= True, max_moves=20):
+    def __init__(self, gameSpeed,cap_moves= True, max_moves=50):
         #game setup
         self.dis_width = 500
         self.dis_height = 600
@@ -88,7 +88,7 @@ class SnakeGame():
             self.generate_food()
     
     def wallCollision(self):
-        if self.snake.headpos[0] == self.numCols or self.snake.headpos[0] < 0 or self.snake.headpos[1] ==self.numRows or self.snake.headpos[1] < 0:
+        if self.snake.headpos[0] >= self.numCols or self.snake.headpos[0] < 0 or self.snake.headpos[1] >= self.numRows or self.snake.headpos[1] < 0:
             self.game_over = True
             
     
