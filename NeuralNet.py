@@ -107,14 +107,14 @@ class NeuralNet:
     def setBiases(self, biases):
         self.inputLayer.biases = biases[0]
         self.outputLayer.biases = biases[-1]
-        for i in range(1, len(self.Layers)-1):
+        for i in range(1, len(self.Layers)-2):
             self.Layers[i].biases = biases[i]
 
     def setWeights(self, weights):
         self.inputLayer.weights = weights[0]
         self.outputLayer.weights = weights[-1]
-        for i in range(1, len(self.Layers)-1):
-            self.Layers[i].biases = weights[i]
+        for i in range(1, len(self.Layers)-2):
+            self.Layers[i].weights = weights[i]
 
     def setFitness(self, fitness):
         self.fitness = fitness

@@ -68,7 +68,7 @@ class SnakeGame():
         grid_spaceing = self.dis_width//self.numCols
         pygame.draw.rect(self.dis, red, [self.food[0]*grid_spaceing+1, self.grid_buffer + self.food[1]*grid_spaceing+1, grid_spaceing-1, grid_spaceing-1])
         self.Snake_Movement()
-        if self.cap_moves and  self.snake.num_moves >= self.max_moves :
+        if self.cap_moves and  self.snake.moves_since_eat >= self.max_moves :
             self.game_over = True
         pygame.draw.rect(self.dis, green,[self.snake.headpos[0]*grid_spaceing+1,self.grid_buffer+self.snake.headpos[1]*grid_spaceing+1, grid_spaceing-1, grid_spaceing-1])
         for block in self.snake.tail_list:

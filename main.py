@@ -11,7 +11,7 @@ import math
 import random
 
 fps = 5000
-game = SnakeGame.SnakeGame(fps)
+game = SnakeGame.SnakeGame(fps, max_moves=20)
 pygame.font.init()
 over = False
 
@@ -20,16 +20,17 @@ def createPop(previousGen=[], members=10, mutationRate=1):
     population = []
     if len(previousGen) == 0:
         for i in range(members):
-            population.append(NeuralNet.NeuralNet(5, 4, 3, 4))
+            population.append(NeuralNet.NeuralNet(5, 4, 5, 4))
     else:
-        mutateChance = random.uniform(0, 1)
-        if mutateChance <= mutationRate:
-            mutate = True
-        else:
-            mutate = False
+        
         for nn1 in previousGen:
             for nn2 in previousGen:
-                nn = NeuralNet.NeuralNet(5, 4, 3, 4)
+                mutateChance = random.uniform(0, 1)
+                if mutateChance <= mutationRate:
+                    mutate = True
+                else:
+                    mutate = False
+                nn = NeuralNet.NeuralNet(5, 4, 5, 4)
                 weights = genWeights(nn1, nn2, mutate)
                 biases = genBiases(nn1, nn2, mutate)
                 nn.setWeights(weights)
@@ -167,6 +168,6 @@ def Train(population, num_generations, num_survivors):
             f.write(str(nn.getBiases()))
 
 
-population = createPop(members=9, mutationRate=.08)
+population = createPop(members=484, mutationRate=.08)
 
-Train(population, 5, 3)
+Train(population, 1500, 22)
