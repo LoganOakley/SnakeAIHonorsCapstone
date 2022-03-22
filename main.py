@@ -3,6 +3,7 @@ from tkinter import NE, W
 from venv import create
 from matplotlib.pyplot import axis
 import pygame
+from GenenticFunctions import crossover
 from Snake import Snake
 import SnakeGame
 import NeuralNet
@@ -22,66 +23,9 @@ def createPop(previousGen=[], members=10, mutationRate=1):
         for i in range(members):
             population.append(NeuralNet.NeuralNet(5, 4, 5, 4))
     else:
-        
-        for nn1 in previousGen:
-            for nn2 in previousGen:
-                mutateChance = random.uniform(0, 1)
-                if mutateChance <= mutationRate:
-                    mutate = True
-                else:
-                    mutate = False
-                nn = NeuralNet.NeuralNet(5, 4, 5, 4)
-                weights = genWeights(nn1, nn2, mutate)
-                biases = genBiases(nn1, nn2, mutate)
-                nn.setWeights(weights)
-                nn.setBiases(biases)
-                population.append(nn)
-
+        population = crossover(previousGen, members)
     return population
 
-
-def genWeights(nn1, nn2, mutate=True):
-    weights = []
-    mutations = []
-    nn1_weights = nn1.getWeights()
-    nn2_weights = nn2.getWeights()
-    if mutate:
-        mutations.append(.1*np.random.randn(*nn1_weights[0].shape))
-        mutations.append(.1*np.random.randn(*nn1_weights[1].shape))
-        mutations.append(.1*np.random.randn(*nn1_weights[2].shape))
-    else:
-        mutations.append(.1*np.random.randn(*nn1_weights[0].shape))
-        mutations.append(.1*np.random.randn(*nn1_weights[1].shape))
-        mutations.append(.1*np.random.randn(*nn1_weights[2].shape))
-    weights.append(np.average(
-        [nn1_weights[0], nn2_weights[0]], axis=0) + mutations[0])
-    weights.append(np.average(
-        [nn1_weights[1], nn2_weights[1]], axis=0) + mutations[1])
-    weights.append(np.average(
-        [nn1_weights[2], nn2_weights[2]], axis=0) + mutations[2])
-    return weights
-
-
-def genBiases(nn1, nn2, mutate=True):
-    biases = []
-    mutations = []
-    nn1_biases = nn1.getBiases()
-    nn2_biases = nn2.getBiases()
-    if mutate:
-        mutations.append(.1*np.random.randn(*nn1_biases[0].shape))
-        mutations.append(.1*np.random.randn(*nn1_biases[1].shape))
-        mutations.append(.1*np.random.randn(*nn1_biases[2].shape))
-    else:
-        mutations.append(.1*np.random.randn(*nn1_biases[0].shape))
-        mutations.append(.1*np.random.randn(*nn1_biases[1].shape))
-        mutations.append(.1*np.random.randn(*nn1_biases[2].shape))
-    biases.append(np.average(
-        [nn1_biases[0], nn2_biases[0]], axis=0) + mutations[0])
-    biases.append(np.average(
-        [nn1_biases[1], nn2_biases[1]], axis=0) + mutations[1])
-    biases.append(np.average(
-        [nn1_biases[2], nn2_biases[2]], axis=0) + mutations[2])
-    return biases
 
 
 def getEnvironment():
@@ -151,12 +95,8 @@ def Train(population, num_generations, num_survivors):
         survivors = getSurvivors(population, num_survivors)
         for survivor in survivors:
             print(f"Fitness: {survivor.getFitness()}")
-        population = createPop(survivors, members)
+            
 
-    # for nn in population:
-    #     nn.writeWeights()
-    #     nn.writeBiases()
-    # should work but biases is a 3d array?
     
     with open("Weight_Storage.txt", "a") as f:
         f.truncate(0)
@@ -168,6 +108,6 @@ def Train(population, num_generations, num_survivors):
             f.write(str(nn.getBiases()))
 
 
-population = createPop(members=484, mutationRate=.08)
+population = createPop(members=500, mutationRate=.08)
 
-Train(population, 1500, 22)
+Train(population, 2000, 10)
