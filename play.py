@@ -8,7 +8,7 @@ test2 = NeuralNet.NeuralNet(5,4,5,4)
 
 population = [test1,test2]
 
-population = GenenticFunctions.crossover(population,2,0)
+population = GenenticFunctions.crossover(population,2,1)
 
 print("Test1: \n")
 print(test1.getWeights())

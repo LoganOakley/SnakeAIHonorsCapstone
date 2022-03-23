@@ -22,22 +22,22 @@ def crossover(survivors, pop_size, mutationRate):
     #each iteration creates 2 children show by looping half the number of population size we get the correct number of snakes
     for i in range((pop_size)//2):
         #get 2 random snakes
-        parent1 = random.choice(survivors)
-        parent2 = random.choice(survivors)
+        parents = random.sample(survivors,2)
+        
         #initialize 2 random nets
         child1 = NeuralNet.NeuralNet(5, 4, 5, 4)
         child2 = NeuralNet.NeuralNet(5, 4, 5, 4)
 
         #get the weight shape
-        Wshapes = [a.shape for a in parent1.getWeights() ]
+        Wshapes = [a.shape for a in parents[0].getWeights() ]
 
         #flatten the parents weights for crossover
-        p1_Wgenes = np.concatenate([a.flatten() for a in parent1.getWeights()])
-        p2_Wgenes = np.concatenate([a.flatten() for a in parent2.getWeights()])
+        p1_Wgenes = np.concatenate([a.flatten() for a in parents[0].getWeights()])
+        p2_Wgenes = np.concatenate([a.flatten() for a in parents[1].getWeights()])
 
         #get a random point to cross over
         split_point = random.randint(0,len(p1_Wgenes)-1)
-
+        
         #first child is the first section of parent 1 and second of parent 2 vice versa for child 2
         c1_Wgenes = np.asarray(p1_Wgenes[0:split_point].tolist() + p2_Wgenes[split_point:].tolist())
         c2_Wgenes = np.asarray(p2_Wgenes[0:split_point].tolist() + p1_Wgenes[split_point:].tolist())
@@ -47,15 +47,15 @@ def crossover(survivors, pop_size, mutationRate):
         child2.setWeights(inflate(c2_Wgenes,Wshapes))
 
         #repeat above for bias
-        p1_Bgenes = np.concatenate([a.flatten() for a in parent1.getBiases()])
-        p2_Bgenes = np.concatenate([a.flatten() for a in parent2.getBiases()])
+        p1_Bgenes = np.concatenate([a.flatten() for a in parents[0].getBiases()])
+        p2_Bgenes = np.concatenate([a.flatten() for a in parents[1].getBiases()])
 
         split_point = random.randint(0,len(p1_Bgenes)-1)
 
         c1_Bgenes = np.asarray(p1_Bgenes[0:split_point].tolist() + p2_Bgenes[split_point:].tolist())
         c2_Bgenes = np.asarray(p1_Bgenes[0:split_point].tolist() + p2_Bgenes[split_point:].tolist())
 
-        Bshapes = [a.shape for a in parent1.getBiases()]
+        Bshapes = [a.shape for a in parents[0].getBiases()]
         child1.setBiases(inflate(c1_Bgenes,Bshapes))
         child2.setBiases(inflate(c2_Bgenes,Bshapes))
 
@@ -66,13 +66,13 @@ def crossover(survivors, pop_size, mutationRate):
         B2mutator = random.uniform(0,1)
 
         if W1mutator <= mutationRate:
-            child1 = mutate(child1)
+            child1.setWeights(mutate(child1))
         if B1mutator <= mutationRate:
-            child1 = mutate(child1,True)
+            child1.setBiases(mutate(child1,True))
         if W2mutator <= mutationRate:
-            child2 = mutate(child2)
+            child2.setWeights(mutate(child2))
         if B2mutator <= mutationRate:
-            child2 = mutate(child2,True)
+            child2.setBiases(mutate(child2,True))
 
         #put the children in the output
         children.append(child1)
@@ -92,7 +92,7 @@ def mutate(agent, mutateBias = False):
         #set gene to random value
         genes[mutatedGene] = .1* np.random.randn()
         #change the agent's weights
-        agent.setWeights(inflate(genes, shape))
+        output = inflate(genes, shape)
     #mutate bias
     else:
         #reflatten for mutation
@@ -103,7 +103,7 @@ def mutate(agent, mutateBias = False):
         #set gene to random value
         genes[mutatedGene] = .1* np.random.randn()
         #change the agent's biases
-        agent.setBiases(inflate(genes, shape))
-    return agent
+        output = inflate(genes, shape)
+    return output
     
     

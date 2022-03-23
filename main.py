@@ -15,10 +15,10 @@ fps = 5000
 game = SnakeGame.SnakeGame(fps, max_moves=20)
 pygame.font.init()
 over = False
-MutationRate = .08
+MutationRate = 0
 
 #initialize population
-def createPop(previousGen=[], members=10, mutationRate=1):
+def createPop(previousGen=[], members=10, mutationRate=0):
     population = []
     #if not previous generation provided, create random population
     if len(previousGen) == 0:
