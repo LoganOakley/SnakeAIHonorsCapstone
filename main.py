@@ -19,11 +19,14 @@ over = False
 
 def createPop(previousGen=[], members=10, mutationRate=1):
     population = []
+    
     if len(previousGen) == 0:
         for i in range(members):
             population.append(NeuralNet.NeuralNet(5, 4, 5, 4))
     else:
-        population = crossover(previousGen, members)
+        
+        population = crossover(previousGen, members, mutationRate)
+       
     return population
 
 
@@ -93,7 +96,9 @@ def Train(population, num_generations, num_survivors):
         print(f"*******************Generation {i}********************")
         Simulate(population)
         survivors = getSurvivors(population, num_survivors)
+        population = createPop(survivors,members)
         for survivor in survivors:
+            
             print(f"Fitness: {survivor.getFitness()}")
             
 

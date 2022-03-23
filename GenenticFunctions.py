@@ -1,3 +1,4 @@
+from tkinter import E
 import numpy as np
 import random
 import NeuralNet
@@ -12,7 +13,7 @@ def inflate(flat, shapes):
         index += size
     return output
 
-def crossover(survivors, pop_size):
+def crossover(survivors, pop_size, mutationRate):
     children = []
     for i in range((pop_size)//2):
         parent1 = random.choice(survivors)
@@ -45,8 +46,37 @@ def crossover(survivors, pop_size):
         child1.setBiases(inflate(c1_Bgenes,Bshapes))
         child2.setBiases(inflate(c2_Bgenes,Bshapes))
 
+        W1mutator = random.uniform(0,1)
+        B1mutator = random.uniform(0,1)
+        W2mutator = random.uniform(0,1)
+        B2mutator = random.uniform(0,1)
+        if W1mutator <= mutationRate:
+            child1 = mutate(child1)
+        if B1mutator <= mutationRate:
+            child1 = mutate(child1,True)
+        if W2mutator <= mutationRate:
+            child2 = mutate(child1)
+        if B2mutator <= mutationRate:
+            child2 = mutate(child1,True)
+
         children.append(child1)
         children.append(child2)
-    for survivor in survivors:
-        children.append(survivor)
+        
     return children
+
+def mutate(agent, mutateBias = False):
+    if not mutateBias:
+        shape = [a.shape for a in agent.getWeights()]
+        genes =  np.concatenate([a.flatten() for a in agent.getWeights()])
+        mutatedGene = random.randint(0, len(genes)-1)
+        genes[mutatedGene] = .1* np.random.randn()
+        agent.setWeights(inflate(genes, shape))
+    else:
+        shape = [a.shape for a in agent.getBiases()]
+        genes =  np.concatenate([a.flatten() for a in agent.getBiases()])
+        mutatedGene = random.randint(0, len(genes)-1)
+        genes[mutatedGene] = .1* np.random.randn()
+        agent.setBiases(inflate(genes, shape))
+    return agent
+    
+    

@@ -1,6 +1,0 @@
-class Food():
-    pass
-
-
-
-
