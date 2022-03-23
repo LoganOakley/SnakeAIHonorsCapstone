@@ -70,9 +70,9 @@ def crossover(survivors, pop_size, mutationRate):
         if B1mutator <= mutationRate:
             child1 = mutate(child1,True)
         if W2mutator <= mutationRate:
-            child2 = mutate(child1)
+            child2 = mutate(child2)
         if B2mutator <= mutationRate:
-            child2 = mutate(child1,True)
+            child2 = mutate(child2,True)
 
         #put the children in the output
         children.append(child1)

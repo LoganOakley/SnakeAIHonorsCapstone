@@ -119,11 +119,14 @@ def Train(population, num_generations, num_survivors):
         Simulate(population)
         #get the best snakes
         survivors = getSurvivors(population, num_survivors)
+        
         #create a new population of snakes using the survivors of the previous generation
         population = createPop(survivors,members, MutationRate)
         #print each survivor's fitness to monitor the progression through generations
         for survivor in survivors:
-            
+
+            #print(survivor.getWeights())
+            #print('\n')
             print(f"Fitness: {survivor.getFitness()}")
             
 
