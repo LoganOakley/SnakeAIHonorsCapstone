@@ -1,7 +1,7 @@
 import pygame
 import SnakeGame
 
-
+#allows human to play game for testing and demonstrations
 
 fps = 8
 game = SnakeGame.SnakeGame(fps, False)

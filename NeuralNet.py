@@ -1,30 +1,23 @@
-from audioop import bias
-import sys
-import matplotlib
+#code adapted from Neural Networks From Scratch https://nnfs.io/
 import numpy as np
-import nnfs
-from nnfs.datasets import spiral_data
-from pkg_resources import yield_lines
+import math
 
-
-# nnfs.init()
-
+#Layer class
 class Layer_Dense:
     def __init__(self, n_inputs, n_neurons, activation):
+        #random weights and biases
         self.weights = 0.10*np.random.randn(n_inputs, n_neurons)
-        # print(self.weights)
         self.biases = 0.10*np.random.randn(1, n_neurons)
         self.activation = activation
 
     def forward(self, inputs):
+        #run the dot product and activation for the layer
         self.output = np.dot(inputs, self.weights) + self.biases
         self.activation.forward(self.output)
 
-    def setWeights(self, weights, biases):
-        self.weights = weights
-        self.biases = biases
 
 
+#rectified linear activation
 class Activation_ReLU:
     def __init__(self):
         pass
@@ -32,6 +25,13 @@ class Activation_ReLU:
     def forward(self, inputs):
         self.output = np.maximum(0, inputs)
 
+
+class Activation_Sigmoid:
+    def sigmoid(self, x):
+        return 1/(1 + math.e**-x)
+    def forward(self, inputs):
+        sigmoidVectorized = np.vectorize(self.sigmoid)
+        self.output = sigmoidVectorized(inputs)
 
 class Activation_Softmax:
     def forward(self, inputs):
@@ -43,39 +43,29 @@ class Activation_Softmax:
         self.output = probabilities
 
 
-class Loss:
-    def calculate(self, output, y):
-        sample_losses = self.forward(output, y)
-        data_loss = np.mean(sample_losses)
-        return data_loss
-
-
-class Loss_CategoricalCrossentropy(Loss):
-    def forward(self, y_pred, y_true):
-        samples = len(y_pred)
-        y_pred_clipped = np.clip(y_pred, 1e-7, 1-1e-7)
-        if len(y_true.shape) == 1:
-            correct_confidences = y_pred_clipped[range(samples), y_true]
-        elif len(y_true.shape) == 2:
-            correct_confidences = np.sum(y_pred_clipped * y_true, axis=1)
-        negative_log_likelyhoods = -np.log(correct_confidences)
-        return negative_log_likelyhoods
-
 
 class NeuralNet:
+
+    #snake NN
     def __init__(self, num_inputs, num_outputs, num_layers, nodesPerLayer):
+        #create input layer with sigmoid activation
         self.inputLayer = Layer_Dense(
-            num_inputs, nodesPerLayer, Activation_ReLU())
+            num_inputs, nodesPerLayer, Activation_Sigmoid())
+        #create output layer with softmax activation
         self.outputLayer = Layer_Dense(
             nodesPerLayer, num_outputs, Activation_Softmax())
         self.Layers = []
+        #put in input layer
         self.Layers.append(self.inputLayer)
+        #create and append each hidden layer with a sigmoid activation
         for layer in range(num_layers-2):
             self.Layers.append(Layer_Dense(
-                nodesPerLayer, nodesPerLayer, Activation_ReLU()))
+                nodesPerLayer, nodesPerLayer, Activation_Sigmoid()))
+        #append output layer
         self.Layers.append(self.outputLayer)
 
     def forward(self, inputs):
+        #do forward for each layer 
         self.inputLayer.forward(inputs)
         for i in range(1, len(self.Layers)):
             self.Layers[i].forward(self.Layers[i-1].activation.output)
@@ -83,45 +73,59 @@ class NeuralNet:
         return self.output
 
     def getWeights(self):
+        #return weights for each layer
         weights = []
         for layer in self.Layers:
             weights.append(layer.weights)
         return weights
 
+
+    #testing another way to write weights
     def writeWeights(self):
         weights = self.getWeights()
         np.savetxt("test.txt", weights, delimiter=' ', fmt='%s',
                    newline='\n', header='', footer='', comments='# ', encoding=None)
 
+    
     def getBiases(self):
+        #return biases for each layer
         biases = []
         for layer in self.Layers:
             biases.append(layer.biases)
         return biases
 
+    #testing another way to write biases
     def writeBiases(self):
         biases = self.getBiases()
         np.savetxt("test1.txt", biases, delimiter=' ', fmt='%s', newline='\n', header='', footer='', comments='# ', encoding=None)
 
 
     def setBiases(self, biases):
+        #set input layer with first biases array
         self.inputLayer.biases = biases[0]
+        #set output layer with last bias array
         self.outputLayer.biases = biases[-1]
+        #for each other layer give it the bias in the corrosponding location
         for i in range(1, len(self.Layers)-2):
             self.Layers[i].biases = biases[i]
 
     def setWeights(self, weights):
+        #set input layer with first weight array
         self.inputLayer.weights = weights[0]
+        #set output layer with last weight array
         self.outputLayer.weights = weights[-1]
+        #for each other layer give it the weight in the corrosponding location
         for i in range(1, len(self.Layers)-2):
             self.Layers[i].weights = weights[i]
 
     def setFitness(self, fitness):
+        #set fitness for the NN
         self.fitness = fitness
     
     def getFitness(self):
         return self.fitness
 
+    #allows comparision and sorting by fitness
     def __lt__(self,other):
         if (self.fitness < other.fitness):
             return True
