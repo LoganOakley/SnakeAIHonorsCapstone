@@ -3,22 +3,26 @@ import SnakeGame
 import GenenticFunctions
 import NeuralNet
 
+
+#small test
 test1 = NeuralNet.NeuralNet(5,4,5,4)
 test2 = NeuralNet.NeuralNet(5,4,5,4)
-
-population = [test1,test2]
-
-population = GenenticFunctions.crossover(population,2,1)
-
 print("Test1: \n")
 print(test1.getWeights())
 
 print("\nTest2: \n")
 print(test2.getWeights())
+population = [test1,test2]
 
-for agent in population:
-    print("\nAgents: \n")
-    print(agent.getWeights())
+for i in range(4):   
+    print(f"\nGen {i}\n")
+    population = GenenticFunctions.crossover(population,2,0)
+    for agent in population:
+        print(f"\nAgent: \n")
+        print(agent.getWeights())
+
+#the layer that contains the split point for crossover is getting set to seemingly random values rather than splitting properly
+
 
 
 #allows human to play game for testing and demonstrations
