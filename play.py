@@ -7,19 +7,17 @@ import NeuralNet
 #small test
 test1 = NeuralNet.NeuralNet(5,4,5,4)
 test2 = NeuralNet.NeuralNet(5,4,5,4)
-print("Test1: \n")
-print(test1.getWeights())
+#print("Test1: \n")
+#print(test1.getWeights())
 
-print("\nTest2: \n")
-print(test2.getWeights())
+#print("\nTest2: \n")
+#print(test2.getWeights())
 population = [test1,test2]
 
-for i in range(4):   
-    print(f"\nGen {i}\n")
-    population = GenenticFunctions.crossover(population,2,0)
-    for agent in population:
-        print(f"\nAgent: \n")
-        print(agent.getWeights())
+   
+    
+population = GenenticFunctions.crossover(population,2,0)
+
 
 #the layer that contains the split point for crossover is getting set to seemingly random values rather than splitting properly
 

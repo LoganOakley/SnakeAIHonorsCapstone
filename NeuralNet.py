@@ -110,13 +110,11 @@ class NeuralNet:
             self.Layers[i].biases = biases[i]
 
     def setWeights(self, weights):
-        #set input layer with first weight array
-        self.inputLayer.weights = weights[0]
-        #set output layer with last weight array
-        self.outputLayer.weights = weights[-1]
         #for each other layer give it the weight in the corrosponding location
-        for i in range(1, len(self.Layers)-2):
+        for i in range(0, len(self.Layers)-1):
             self.Layers[i].weights = weights[i]
+        self.inputLayer = self.Layers[0]
+        self.outputLayer = self.Layers[-1]
 
     def setFitness(self, fitness):
         #set fitness for the NN

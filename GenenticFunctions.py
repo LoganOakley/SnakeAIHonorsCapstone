@@ -34,17 +34,20 @@ def crossover(survivors, pop_size, mutationRate):
         #flatten the parents weights for crossover
         p1_Wgenes = np.concatenate([a.flatten() for a in parents[0].getWeights()])
         p2_Wgenes = np.concatenate([a.flatten() for a in parents[1].getWeights()])
-
         #get a random point to cross over
         split_point = random.randint(0,len(p1_Wgenes)-1)
         
         #first child is the first section of parent 1 and second of parent 2 vice versa for child 2
         c1_Wgenes = np.asarray(p1_Wgenes[0:split_point].tolist() + p2_Wgenes[split_point:].tolist())
+        
         c2_Wgenes = np.asarray(p2_Wgenes[0:split_point].tolist() + p1_Wgenes[split_point:].tolist())
         #they layer that contains the split point is being set to seemingly randome values rather than being spliced together. Need to locate cause
 
-        #set the weights with the inflated gense
+        #set     the weights with the inflated gense
         child1.setWeights(inflate(c1_Wgenes,Wshapes))
+        print(inflate(c1_Wgenes, Wshapes))
+        print('\n')
+        print(child1.getWeights())
         child2.setWeights(inflate(c2_Wgenes,Wshapes))
 
         #repeat above for bias
