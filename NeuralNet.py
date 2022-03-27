@@ -76,7 +76,7 @@ class NeuralNet:
         #return weights for each layer
         weights = []
         for layer in self.Layers:
-            weights.append(layer.weights)
+            weights.append(layer.weights)  
         return weights
 
 
@@ -111,7 +111,7 @@ class NeuralNet:
 
     def setWeights(self, weights):
         #for each other layer give it the weight in the corrosponding location
-        for i in range(0, len(self.Layers)-1):
+        for i in range(len(self.Layers)):
             self.Layers[i].weights = weights[i]
         self.inputLayer = self.Layers[0]
         self.outputLayer = self.Layers[-1]

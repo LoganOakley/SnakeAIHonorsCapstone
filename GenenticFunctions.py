@@ -45,9 +45,7 @@ def crossover(survivors, pop_size, mutationRate):
 
         #set     the weights with the inflated gense
         child1.setWeights(inflate(c1_Wgenes,Wshapes))
-        print(inflate(c1_Wgenes, Wshapes))
-        print('\n')
-        print(child1.getWeights())
+        
         child2.setWeights(inflate(c2_Wgenes,Wshapes))
 
         #repeat above for bias
@@ -78,6 +76,7 @@ def crossover(survivors, pop_size, mutationRate):
         if B2mutator <= mutationRate:
             child2.setBiases(mutate(child2,True))
 
+        get  = child1.getWeights()
         #put the children in the output
         children.append(child1)
         children.append(child2)
