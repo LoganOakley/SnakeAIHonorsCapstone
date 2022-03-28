@@ -1,3 +1,4 @@
+from msilib.schema import Class
 from tkinter import E
 import numpy as np
 import random
@@ -25,8 +26,8 @@ def crossover(survivors, pop_size, mutationRate):
         parents = random.sample(survivors,2)
         
         #initialize 2 random nets
-        child1 = NeuralNet.NeuralNet(5, 4, 5, 4)
-        child2 = NeuralNet.NeuralNet(5, 4, 5, 4)
+        child1 = NeuralNet.NeuralNet(8, 4, 5, 4)
+        child2 = NeuralNet.NeuralNet(8, 4, 5, 4)
 
         #get the weight shape
         Wshapes = [a.shape for a in parents[0].getWeights() ]

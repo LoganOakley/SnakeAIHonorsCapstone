@@ -14,6 +14,7 @@ class Layer_Dense:
         #run the dot product and activation for the layer
         self.output = np.dot(inputs, self.weights) + self.biases
         self.activation.forward(self.output)
+        print(self.activation.output)
 
 
 
@@ -41,7 +42,6 @@ class Activation_Softmax:
         probabilities = exp_values / np.sum(exp_values, axis=1, keepdims=True)
         # print(probabilities)
         self.output = probabilities
-
 
 
 class NeuralNet:

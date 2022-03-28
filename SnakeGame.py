@@ -25,7 +25,7 @@ class SnakeGame():
         self.game_over = False
         self.game_close = False
         self.numRows, self.numCols = 10, 10
-        self.snake = Snake(self.numRows, self.numCols)
+        self.snake = Snake( self.numCols,self.numRows)
         self.gameSpeed = gameSpeed
         self.score = 0
         self.generate_food()
@@ -120,7 +120,7 @@ class SnakeGame():
     def checkOver(self):
         #check that the game is over if so we return the values needed for fitness function
         if self.game_over:
-            return (self.snake.length, self.snake.num_moves)
+            return (self.snake.length, self.snake.movesTowardsFood)
         else:
             return False
 
@@ -143,7 +143,10 @@ class SnakeGame():
                     self.event_handler()
         #move the snake and update distance to food
         self.snake.move()
+        self.previousDistToFood = self.disToFood
         self.disToFood = self.getDistance()
+        if self.previousDistToFood < self.disToFood:
+            self.snake.movesTowardsFood += 1
         #print(f"Distance: {self.disToFood}")
 
     #close the game and perform any other required functions

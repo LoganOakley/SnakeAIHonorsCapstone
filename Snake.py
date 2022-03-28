@@ -5,8 +5,7 @@ import pygame
 
 class Snake:
 
-    #total number of moves for fitness
-    num_moves = 0
+    movesTowardsFood = 0
     #moves since last food to test for game ending due to infinite loop
     moves_since_eat = 0
     def __init__(self,rows, cols):
@@ -28,7 +27,7 @@ class Snake:
         #update head pos
         self.headpos = [self.headpos[0] + self.velocity[0], self.headpos[1] + self.velocity[1]]
         #increment move counters
-        self.num_moves+=1
+
         self.moves_since_eat +=1
 
     def set_vel(self,vel):

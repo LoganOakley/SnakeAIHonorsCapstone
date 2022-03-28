@@ -11,7 +11,7 @@ import numpy as np
 import math
 import random
 
-fps = 5000
+fps = 30
 game = SnakeGame.SnakeGame(fps, max_moves=20)
 pygame.font.init()
 over = False
@@ -23,7 +23,7 @@ def createPop(previousGen=[], members=10, mutationRate=0):
     #if not previous generation provided, create random population
     if len(previousGen) == 0:
         for i in range(members):
-            population.append(NeuralNet.NeuralNet(5, 4, 5, 4))
+            population.append(NeuralNet.NeuralNet(8, 4, 5, 4))
 
     #if previous generations survivors are given, perform crossover to get new population
     else:
@@ -52,6 +52,29 @@ def getEnvironment():
         else:
             #empty spaces in group 2
             outputs[i] = 2
+    food_pos = game.food
+    if start_pos[0] == food_pos[0]:
+        if start_pos[1]>food_pos[1]:
+            outputs.append(1)
+            outputs.append(0)
+        else:
+            outputs.append(0)
+            outputs.append(1)
+    else:
+        outputs.append(0)
+        outputs.append(0)
+    if start_pos[1] == food_pos[1]:
+        if start_pos[0]>food_pos[0]:
+            outputs.append(1)
+            outputs.append(0)
+        else:
+            outputs.append(0)
+            outputs.append(1)
+    else:
+        outputs.append(0)
+        outputs.append(0)
+
+
     return outputs
 
 
@@ -66,8 +89,7 @@ def Simulate(population):
             #get value of spaces the snake could move to
             environment = getEnvironment()
             #create input list
-            input = [dis_to_food, environment[0],
-                     environment[1], environment[2], environment[3]]
+            input = environment
             #get output for current Neural net
             nn_out = nn.forward(input)
 
@@ -81,7 +103,7 @@ def Simulate(population):
                 game.snake.set_vel([1, 0])
             elif outputIndex == 2:
                 game.snake.set_vel([0, -1])
-            if outputIndex == 3:
+            elif outputIndex == 3:
                 game.snake.set_vel([-1, 0])
 
             #check if snake hit self, wall or food
@@ -96,7 +118,7 @@ def Simulate(population):
                 #otherwise we draw the next frame
                 game.DrawFrame()
         #fitness function is currently 10*snake_length + total_moves_made
-        fitness = over[0] * 10 + over[1]
+        fitness = over[0] * 15 + over[1]
         nn.setFitness(fitness)
         game.reset()
 
@@ -141,7 +163,7 @@ def Train(population, num_generations, num_survivors):
             f.write(str(nn.getBiases()))
 
 #get inital population
-population = createPop(members=500, mutationRate=MutationRate)
+population = createPop(members=50, mutationRate=MutationRate)
 
 #Train the population
-Train(population, 2000, 10)
+Train(population, 2000, 5)
