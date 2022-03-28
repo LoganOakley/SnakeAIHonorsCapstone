@@ -32,6 +32,7 @@ class SnakeGame():
         self.cap_moves = cap_moves
         self.max_moves = max_moves
         self.disToFood = self.getDistance()
+        self.starved = False
         
 
     def DrawFrame(self):
@@ -84,6 +85,7 @@ class SnakeGame():
         #check if we are limiting the moves and if so if the snake has moved too mcuh
         if self.cap_moves and  self.snake.moves_since_eat >= self.max_moves :
             #if so snake dies
+            self.starved = True
             self.game_over = True
         #draw snake head
         pygame.draw.rect(self.dis, green,[self.snake.headpos[0]*grid_spaceing+1,self.grid_buffer+self.snake.headpos[1]*grid_spaceing+1, grid_spaceing-1, grid_spaceing-1])
@@ -120,7 +122,7 @@ class SnakeGame():
     def checkOver(self):
         #check that the game is over if so we return the values needed for fitness function
         if self.game_over:
-            return (self.snake.length, self.snake.movesTowardsFood)
+            return (self.snake.length, self.snake.movesTowardsFood, self.starved)
         else:
             return False
 
@@ -132,9 +134,9 @@ class SnakeGame():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    self.snake.set_vel([-1,0])
+                    self.snake.turn_left()
                 elif event.key == pygame.K_RIGHT:
-                    self.snake.set_vel([1,0])
+                    self.snake.turn_right()
                 elif event.key == pygame.K_UP:
                     self.snake.set_vel([0,-1])
                 elif event.key == pygame.K_DOWN:

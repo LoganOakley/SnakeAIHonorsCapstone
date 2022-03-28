@@ -14,7 +14,7 @@ class Layer_Dense:
         #run the dot product and activation for the layer
         self.output = np.dot(inputs, self.weights) + self.biases
         self.activation.forward(self.output)
-        print(self.activation.output)
+        #print(self.activation.output)
 
 
 
@@ -43,6 +43,9 @@ class Activation_Softmax:
         # print(probabilities)
         self.output = probabilities
 
+class Activation_Argmax:
+    def forward(self, inputs):
+        self.output = np.argmax(inputs)
 
 class NeuralNet:
 
@@ -53,7 +56,7 @@ class NeuralNet:
             num_inputs, nodesPerLayer, Activation_Sigmoid())
         #create output layer with softmax activation
         self.outputLayer = Layer_Dense(
-            nodesPerLayer, num_outputs, Activation_Softmax())
+            nodesPerLayer, num_outputs, Activation_Argmax())
         self.Layers = []
         #put in input layer
         self.Layers.append(self.inputLayer)

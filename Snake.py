@@ -38,5 +38,17 @@ class Snake:
         #increase lenght and reset move since eat counter
         self.length += 1
         self.moves_since_eat=0
+
+    def turn_left(self):
+        temp_x = self.velocity[0]
+        temp_y = self.velocity[1]
+        self.velocity[0] = temp_y
+        self.velocity[1] = -temp_x
+    
+    def turn_right(self):
+        temp_x = self.velocity[0]
+        temp_y = self.velocity[1]
+        self.velocity[0] =  -temp_y
+        self.velocity[1] =  temp_x
         
         

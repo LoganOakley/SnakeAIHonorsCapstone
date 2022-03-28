@@ -11,7 +11,7 @@ import numpy as np
 import math
 import random
 
-fps = 30
+fps = 5000
 game = SnakeGame.SnakeGame(fps, max_moves=20)
 pygame.font.init()
 over = False
@@ -23,7 +23,7 @@ def createPop(previousGen=[], members=10, mutationRate=0):
     #if not previous generation provided, create random population
     if len(previousGen) == 0:
         for i in range(members):
-            population.append(NeuralNet.NeuralNet(8, 4, 5, 4))
+            population.append(NeuralNet.NeuralNet(3, 3, 8, 8))
 
     #if previous generations survivors are given, perform crossover to get new population
     else:
@@ -36,44 +36,22 @@ def createPop(previousGen=[], members=10, mutationRate=0):
 #return the spaces imediately around the snake's head.
 def getEnvironment():
     start_pos = game.snake.headpos
-    north = [start_pos[0], start_pos[1]-1]
-    south = [start_pos[0], start_pos[1]+1]
-    east = [start_pos[0]+1, start_pos[1]]
-    west = [start_pos[0]-1, start_pos[1]]
-    directions = [north, south, east, west]
-    outputs = [0, 0, 0, 0]
+    straight = start_pos + game.snake.velocity
+    left     = start_pos + [game.snake.velocity[1], -game.snake.velocity[0]]
+    right    = start_pos + [-game.snake.velocity[1], game.snake.velocity[0]]
+    directions = [straight, left, right]
+    outputs = [0, 0, 0]
     for i in range(len(directions)):
-        if directions[i] == game.food:
-            #food is puts space in group 3
-            outputs[i] = 3
-        elif directions[i] in game.snake.tail_list or directions[i][0] >= game.numCols or directions[i][1] >= game.numRows or directions[i][0] < 0 or directions[i][1] < 0:
+        if directions[i] in game.snake.tail_list or directions[i][0] >= game.numCols or directions[i][1] >= game.numRows or directions[i][0] < 0 or directions[i][1] < 0:
             #spaces that would kill the snake go in group 1
             outputs[i] = 1
         else:
-            #empty spaces in group 2
-            outputs[i] = 2
+            #non-lethal positions get 0
+            outputs[i] = 0
     food_pos = game.food
-    if start_pos[0] == food_pos[0]:
-        if start_pos[1]>food_pos[1]:
-            outputs.append(1)
-            outputs.append(0)
-        else:
-            outputs.append(0)
-            outputs.append(1)
-    else:
-        outputs.append(0)
-        outputs.append(0)
-    if start_pos[1] == food_pos[1]:
-        if start_pos[0]>food_pos[0]:
-            outputs.append(1)
-            outputs.append(0)
-        else:
-            outputs.append(0)
-            outputs.append(1)
-    else:
-        outputs.append(0)
-        outputs.append(0)
 
+    #use 3 inputs for location of food left or right or straight
+    
 
     return outputs
 
@@ -95,16 +73,14 @@ def Simulate(population):
 
             # print(nn_out)
             #get maxium output value to pick which direction snake will take
-            outputIndex = np.argmax(nn_out)
-
+            outputIndex = nn_out
             if outputIndex == 0:
-                game.snake.set_vel([0, 1])
+                pass
             elif outputIndex == 1:
-                game.snake.set_vel([1, 0])
+                game.snake.turn_left()
             elif outputIndex == 2:
-                game.snake.set_vel([0, -1])
-            elif outputIndex == 3:
-                game.snake.set_vel([-1, 0])
+                game.snake.turn_right
+
 
             #check if snake hit self, wall or food
             game.checkCollision()
@@ -119,6 +95,8 @@ def Simulate(population):
                 game.DrawFrame()
         #fitness function is currently 10*snake_length + total_moves_made
         fitness = over[0] * 15 + over[1]
+        if over[2]:
+            fitness -= 50
         nn.setFitness(fitness)
         game.reset()
 
