@@ -1,4 +1,5 @@
 from pickletools import read_bytes1
+from tabnanny import check
 from tkinter import NE, W
 from venv import create
 from matplotlib.pyplot import axis
@@ -10,20 +11,21 @@ import NeuralNet
 import numpy as np
 import math
 import random
+import time
 
-fps = 5000
+fps = 30
 game = SnakeGame.SnakeGame(fps, max_moves=20)
 pygame.font.init()
 over = False
-MutationRate = 0
+MutationRate = .8
 
 #initialize population
-def createPop(previousGen=[], members=10, mutationRate=0):
+def createPop(previousGen=[], members=10, mutationRate=.8):
     population = []
     #if not previous generation provided, create random population
     if len(previousGen) == 0:
         for i in range(members):
-            population.append(NeuralNet.NeuralNet(3, 3, 8, 8))
+            population.append(NeuralNet.NeuralNet(6, 3, 4, 4))
 
     #if previous generations survivors are given, perform crossover to get new population
     else:
@@ -36,9 +38,12 @@ def createPop(previousGen=[], members=10, mutationRate=0):
 #return the spaces imediately around the snake's head.
 def getEnvironment():
     start_pos = game.snake.headpos
-    straight = start_pos + game.snake.velocity
-    left     = start_pos + [game.snake.velocity[1], -game.snake.velocity[0]]
-    right    = start_pos + [-game.snake.velocity[1], game.snake.velocity[0]]
+    vel_left = [game.snake.velocity[1], -game.snake.velocity[0]]
+    vel_right = [-game.snake.velocity[1], game.snake.velocity[0]]
+    vel_straight = game.snake.velocity
+    straight = start_pos + vel_straight
+    left     = start_pos + vel_left
+    right    = start_pos + vel_right
     directions = [straight, left, right]
     outputs = [0, 0, 0]
     for i in range(len(directions)):
@@ -50,10 +55,46 @@ def getEnvironment():
             outputs[i] = 0
     food_pos = game.food
 
-    #use 3 inputs for location of food left or right or straight
+    #Need to add looking for food to the left right or striaght
+    #foodAhead = check_for_food(start_pos, vel_straight, food_pos)
+    #spaces_left = check_for_food(start_pos, vel_left, food_pos)
+    #spaces_right = check_for_food(start_pos,vel_right , food_pos)
     
+    outputs.append(0)
+    outputs.append(0)
+    outputs.append(0)
 
     return outputs
+
+def check_for_food(curr_space, direction,food):
+    if direction[0] == 0:
+        if curr_space[0] == food[0]:
+            if direction[1] > 0:
+                if curr_space[1] < food[1]:
+                    return 1 
+                else:
+                    return 0
+            else:
+                if curr_space[1] > food[1]:
+                    return 1
+                else:
+                    return 0
+        else:
+            return 0
+    else:
+        if curr_space[1] == food[1]:
+            if direction[0] > 0:
+                if curr_space[0] < food[0]:
+                    return 1 
+                else:
+                    return 0
+            else:
+                if curr_space[0] > food[0]:
+                    return 1
+                else:
+                    return 0
+        else:
+            return 0
 
 
 def Simulate(population):
@@ -75,7 +116,10 @@ def Simulate(population):
             #get maxium output value to pick which direction snake will take
             outputIndex = nn_out
             if outputIndex == 0:
-                pass
+                if(game.snake.velocity == [0,0]):
+                    game.snake.velocity = [0,-1]
+                else:
+                    pass
             elif outputIndex == 1:
                 game.snake.turn_left()
             elif outputIndex == 2:
@@ -94,9 +138,9 @@ def Simulate(population):
                 #otherwise we draw the next frame
                 game.DrawFrame()
         #fitness function is currently 10*snake_length + total_moves_made
-        fitness = over[0] * 15 + over[1]
-        if over[2]:
-            fitness -= 50
+        fitness = over[0] * 15 + over[1] +over[2]*2
+        if over[3]:
+            fitness -= 17
         nn.setFitness(fitness)
         game.reset()
 

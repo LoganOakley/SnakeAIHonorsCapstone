@@ -13,14 +13,15 @@ class Snake:
         self.headpos = [cols/2, rows/2]
         self.length = 0
         self.tail_list = []
-        self.velocity = [0,0]
+        self.velocity = [0,-1]
+        self.squares_visited = []
 
     #change position based onvelocity
     def move(self):
         #if snake just started give base movement
-        if self.velocity==[0,0]:
-            self.velocity =[-1,0]
         #insert into the first location in taillist the current head
+        if (self.headpos not in self.squares_visited):
+            self.squares_visited.append(self.headpos)
         self.tail_list.insert(0,self.headpos)
         #remove all of the blocks past the length of the snake
         self.tail_list = self.tail_list[0:self.length]
@@ -40,12 +41,17 @@ class Snake:
         self.moves_since_eat=0
 
     def turn_left(self):
+        if(self.velocity)==[0,0]:
+            self.velocity = [0,-1]
         temp_x = self.velocity[0]
         temp_y = self.velocity[1]
         self.velocity[0] = temp_y
         self.velocity[1] = -temp_x
     
+    
     def turn_right(self):
+        if(self.velocity)==[0,0]:
+            self.velocity = [0,-1]
         temp_x = self.velocity[0]
         temp_y = self.velocity[1]
         self.velocity[0] =  -temp_y

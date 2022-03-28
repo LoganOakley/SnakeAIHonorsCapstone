@@ -122,7 +122,7 @@ class SnakeGame():
     def checkOver(self):
         #check that the game is over if so we return the values needed for fitness function
         if self.game_over:
-            return (self.snake.length, self.snake.movesTowardsFood, self.starved)
+            return (self.snake.length, self.snake.movesTowardsFood,len(self.snake.squares_visited) ,self.starved)
         else:
             return False
 

@@ -26,8 +26,8 @@ def crossover(survivors, pop_size, mutationRate):
         parents = random.sample(survivors,2)
         
         #initialize 2 random nets
-        child1 = NeuralNet.NeuralNet(3, 3, 8, 8)
-        child2 = NeuralNet.NeuralNet(3, 3, 8, 8)
+        child1 = NeuralNet.NeuralNet(6, 3, 4,4)
+        child2 = NeuralNet.NeuralNet(6, 3, 4,4)
 
         #get the weight shape
         Wshapes = [a.shape for a in parents[0].getWeights() ]
