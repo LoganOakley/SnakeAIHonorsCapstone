@@ -1,36 +1,34 @@
-from pickletools import read_bytes1
-from tabnanny import check
-from tkinter import NE, W
-from venv import create
-from matplotlib.pyplot import axis
+
+from inspect import CORO_SUSPENDED
 import pygame
-from GenenticFunctions import crossover
-from Snake import Snake
+from GenenticFunctions import crossover, mutate
 import SnakeGame
 import NeuralNet
+from KerasNetwork import create_model, predict_action
 import numpy as np
-import math
 import random
-import time
-
-fps = 30
+fps = 60
 game = SnakeGame.SnakeGame(fps, max_moves=20)
-pygame.font.init()
+pygame.init()
 over = False
-MutationRate = .8
+
+load_progress = True
 
 #initialize population
-def createPop(previousGen=[], members=10, mutationRate=.8):
+def createPop( members=10):
     population = []
+    
     #if not previous generation provided, create random population
-    if len(previousGen) == 0:
+    
+    for i in range(members):
+        population.append(create_model())
+    if load_progress:
         for i in range(members):
-            population.append(NeuralNet.NeuralNet(6, 3, 4, 4))
+            population[i].load_weights("SavedModels/model_new"+str(i)+".keras")
+    
+
 
     #if previous generations survivors are given, perform crossover to get new population
-    else:
-        
-        population = crossover(previousGen, members, mutationRate)
        
     return population
 
@@ -56,13 +54,13 @@ def getEnvironment():
     food_pos = game.food
 
     #Need to add looking for food to the left right or striaght
-    #foodAhead = check_for_food(start_pos, vel_straight, food_pos)
-    #spaces_left = check_for_food(start_pos, vel_left, food_pos)
-    #spaces_right = check_for_food(start_pos,vel_right , food_pos)
+    food_ahead = check_for_food(start_pos, vel_straight, food_pos)
+    food_left = check_for_food(start_pos, vel_left, food_pos)
+    food_right = check_for_food(start_pos,vel_right , food_pos)
     
-    outputs.append(0)
-    outputs.append(0)
-    outputs.append(0)
+    outputs.append(food_ahead)
+    outputs.append(food_left)
+    outputs.append(food_right)
 
     return outputs
 
@@ -98,19 +96,18 @@ def check_for_food(curr_space, direction,food):
 
 
 def Simulate(population):
-    for nn in population:
+    fitnesses=[0 for i in range(len(population))]
+    for i in range(len(population)):
         while not game.game_close:
             # Lock the game at a set fps
 
             game.gameClock.tick(game.gameSpeed)
-            #manhatten distence to food for input
-            dis_to_food = game.getDistance()
+
             #get value of spaces the snake could move to
             environment = getEnvironment()
-            #create input list
-            input = environment
+            
             #get output for current Neural net
-            nn_out = nn.forward(input)
+            nn_out = predict_action(environment,population,i)
 
             # print(nn_out)
             #get maxium output value to pick which direction snake will take
@@ -138,18 +135,18 @@ def Simulate(population):
                 #otherwise we draw the next frame
                 game.DrawFrame()
         #fitness function is currently 10*snake_length + total_moves_made
-        fitness = over[0] * 15 + over[1] +over[2]*2
+        fitness = over[0] * 100 + over[1] +over[2]*2
         if over[3]:
-            fitness -= 17
-        nn.setFitness(fitness)
+            fitness -= 30
+        fitnesses[i]=fitness
         game.reset()
+    return fitnesses
 
 
-def getSurvivors(pop, num_survivors):
-    #sort population by fitness values
-    pop.sort(reverse=True)
-    #return the best nets from the population up to the num_survivors
-    return pop[0:num_survivors]
+def save_pool(population):
+    for xi in range(len(population)):
+        population[xi].save_weights("SavedModels/model_new" + str(xi) + ".keras")
+    print("Saved current pool!")
 
 
 def Train(population, num_generations, num_survivors):
@@ -160,32 +157,50 @@ def Train(population, num_generations, num_survivors):
     for i in range(num_generations):
         print(f"*******************Generation {i}********************")
         #run the game for each snake 
-        Simulate(population)
-        #get the best snakes
-        survivors = getSurvivors(population, num_survivors)
-        
-        #create a new population of snakes using the survivors of the previous generation
-        population = createPop(survivors,members, MutationRate)
-        #print each survivor's fitness to monitor the progression through generations
-        for survivor in survivors:
-
-            #print(survivor.getWeights())
-            #print('\n')
-            print(f"Fitness: {survivor.getFitness()}")
+        new_weights = []
+        fitnesses = Simulate(population)
+        survivors, survivor_fitnesses = getSurvivors(population, fitnesses)
+        for fitness in fitnesses:
+            print(f'Fitness: {fitness}\n')
+        print("Selected fitnesses:\n")
+        for fitness in survivor_fitnesses:
+            print(f'Fitness: {fitness}\n')
+        parents = random.choices(survivors,weights = survivor_fitnesses, k=pop_size)
+        for i in range(pop_size // 2):
             
+            crossed_weights = crossover( parents[i], parents[i+1])
+            mutated1 = mutate(crossed_weights[0])
+            mutated2 = mutate(crossed_weights[1])
 
-    #write last generations weights and biases to reinitiate for furthur training later and for demonstrations
-    with open("Weight_Storage.txt", "a") as f:
-        f.truncate(0)
-        for nn in population:
-            f.write(str(nn.getWeights()))
-    with open("Bias_Storage.txt", "a") as f:
-        f.truncate(0)
-        for nn in population:
-            f.write(str(nn.getBiases()))
+            new_weights.append(mutated1)
+            new_weights.append(mutated2)
+
+
+        
+        for i in range(len(new_weights)):
+            population[i].set_weights(new_weights[i])
+        population[i].set_weights(survivors[0].get_weights())
+        save_pool(population)
+
+
+def getSurvivors(pop, fit):
+    
+    #zip together
+    mappedFitness = list(zip(pop,fit))
+    #sort by fitness to get the best models
+    mappedFitness.sort(key= lambda x:x[1], reverse=True )
+    #return the best models as a list to be put through crossover
+    numSurvivors = round(len(pop)*.15) 
+    mappedSurvivors = mappedFitness[0:numSurvivors]
+    survivors = [mappedSurvivors[i][0] for i in range(len(mappedSurvivors))]
+    survivor_fits = [mappedSurvivors[i][1] for i in range(len(mappedSurvivors))]
+    return survivors, survivor_fits
+
 
 #get inital population
-population = createPop(members=50, mutationRate=MutationRate)
+pop_size = 50
+
+population = createPop(members=pop_size)
 
 #Train the population
 Train(population, 2000, 5)

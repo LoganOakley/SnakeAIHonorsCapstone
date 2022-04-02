@@ -147,7 +147,7 @@ class SnakeGame():
         self.snake.move()
         self.previousDistToFood = self.disToFood
         self.disToFood = self.getDistance()
-        if self.previousDistToFood < self.disToFood:
+        if self.previousDistToFood > self.disToFood:
             self.snake.movesTowardsFood += 1
         #print(f"Distance: {self.disToFood}")
 
