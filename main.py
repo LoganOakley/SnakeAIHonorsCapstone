@@ -160,8 +160,6 @@ def Train(population, num_generations, num_survivors):
         new_weights = []
         fitnesses = Simulate(population)
         survivors, survivor_fitnesses = getSurvivors(population, fitnesses)
-        for fitness in fitnesses:
-            print(f'Fitness: {fitness}\n')
         print("Selected fitnesses:\n")
         for fitness in survivor_fitnesses:
             print(f'Fitness: {fitness}\n')
@@ -179,7 +177,7 @@ def Train(population, num_generations, num_survivors):
         
         for i in range(len(new_weights)):
             population[i].set_weights(new_weights[i])
-        population[i].set_weights(survivors[0].get_weights())
+        population[0].set_weights(survivors[0].get_weights())
         save_pool(population)
 
 
