@@ -51,7 +51,7 @@ class SnakeGame():
         row = random.randrange(0, self.numRows)
         col = random.randrange(0, self.numCols)
         #check that food not inside of snake
-        while [col,row] in self.snake.tail_list or [row,col]==self.snake.headpos:
+        while [col,row] in self.snake.tail_list or [col,row]==self.snake.headpos:
             #if it is move the food
             row = random.randrange(0, self.numRows)
             col = random.randrange(0, self.numCols)

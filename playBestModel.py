@@ -7,7 +7,7 @@ from KerasNetwork import create_model, predict_action
 
 #allows human to play game for testing and demonstrations
 best = create_model()
-best.load_weights("SavedModels/HighScore_3439.keras")
+best.load_weights("SavedModels_3/HighScore_4646.keras")
 fps = 8
 game = SnakeGame.SnakeGame(fps, False)
 pygame.font.init()
