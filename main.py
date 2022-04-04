@@ -164,7 +164,7 @@ def Train(population, num_generations):
         medianFitness = np.median(fitnesses)
         maxFitness= survivor_fitnesses[0]
         file = open('SavedFitnesses/Fitnesses_3', 'a')
-        file.write(str([i,medianFitness, maxFitness])+';')
+        file.write(i+','+medianFitness+','+maxFitness+'\n')
         file.close()
         print("Selected fitnesses:\n")
         for fitness in survivor_fitnesses:
