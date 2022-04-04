@@ -158,6 +158,8 @@ class SnakeGame():
 
     def reset(self):
         self.__init__(self.gameSpeed)
+
+    
         
 
             

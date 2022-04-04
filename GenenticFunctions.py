@@ -17,7 +17,7 @@ def crossover(parent1, parent2):
 def mutate(weights):
     for i in range(len(weights)):
         for j in range(len(weights[i])):
-            if( random.uniform(0,1) > .99):
+            if( random.uniform(0,1) > .99): #1% mutation rate per gene for roughly 1 mutation per child
                 change = random.uniform(-.5,.5)
                 weights[i][j] += change
     return weights
