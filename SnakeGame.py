@@ -5,7 +5,11 @@ import random
 from Snake import Snake
 
 pygame.init()
- 
+moveAudio = '/src/Audio/Move.mp3'
+soundTrackAudio = '/src/Audio/SoundTrack.mp3'
+DeathAudio = '/src/Audio/Death.mp3'
+EatAudio = '/src/Audio/Eat.mp3'
+
 #constants
 white = (255, 255, 255)
 yellow = (255, 255, 102)
@@ -33,9 +37,18 @@ class SnakeGame():
         self.max_moves = max_moves
         self.disToFood = self.getDistance()
         self.starved = False
+        self.moveAudio = pygame.mixer.Sound('src\\Audio\\Move.mp3')
+        self.soundTrackAudio = pygame.mixer.Sound('src/Audio\\SoundTrack.mp3')
+        self.soundTrackAudio.set_volume(.5)
+        self.DeathAudio = pygame.mixer.Sound('src\\Audio\\Death.mp3')
+        self.DeathAudio.set_volume(.3)
+        self.EatAudio = pygame.mixer.Sound('src\\Audio\\Eat.mp3')
+        self.EatAudio.set_volume(.1)
+        self.soundTrackAudio.play()
         
 
     def DrawFrame(self):
+        grid_spaceing = self.dis_width//self.numCols
         #clear screen
         self.dis.fill(black)
         #draw grid
@@ -48,6 +61,7 @@ class SnakeGame():
     
     def generate_food(self):
         #put food in random location
+        
         row = random.randrange(0, self.numRows)
         col = random.randrange(0, self.numCols)
         #check that food not inside of snake
@@ -103,7 +117,7 @@ class SnakeGame():
     def foodCollision(self):
         #if head on food grow the snake and make new food
         if self.snake.headpos == self.food:
-            
+            self.EatAudio.play(0)
             self.snake.grow()
             self.generate_food()
     
@@ -148,6 +162,7 @@ class SnakeGame():
         self.previousDistToFood = self.disToFood
         self.disToFood = self.getDistance()
         if self.previousDistToFood > self.disToFood:
+            
             self.snake.movesTowardsFood += 1
         #print(f"Distance: {self.disToFood}")
 

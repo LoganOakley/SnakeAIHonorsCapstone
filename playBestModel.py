@@ -76,7 +76,7 @@ def check_for_food(curr_space, direction,food):
 
 while not game.game_close:
             # Lock the game at a set fps
-            environment = getEnvironment()
+            environment= getEnvironment()
             game.gameClock.tick(game.gameSpeed)
 
             #get value of spaces the snake could move to
@@ -84,6 +84,7 @@ while not game.game_close:
             
             #get output for current Neural net
             nn_out = predict_action(environment,[best],0)
+
 
             # print(nn_out)
             #get maxium output value to pick which direction snake will take
